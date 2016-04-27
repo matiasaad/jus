@@ -1,0 +1,35 @@
+#myTable img {
+ argin-right: 3px;
+ margin-left: 3px;
+ padding: 0px;
+}
+
+
+table.tablesorter {
+	border: 1px solid #CCCCCC;
+	font-size: 8pt;
+	width: 100%;
+	text-align: left;
+	margin: 8px 0 5px 0;
+}
+
+table.tablesorter tbody td, table.tablesorter thead th {
+	color: #666666;
+	background-color: #FFF;
+	vertical-align: top;
+	border-bottom: 1px solid #CCC;
+	padding: 7px;
+	line-height: 20px;
+	border-right: 1px solid #CCC;
+}
+
+
+table.tablesorter tbody tr.odd td 			{ background-color:#E9E9E9; }
+table.tablesorter thead tr .headerSortUp 		{ background-image: url(../img/asc.gif); }
+table.tablesorter thead tr .headerSortDown 	{ background-image: url(../img/desc.gif); }
+
+.paginator { list-style : none; display : block; padding: 8px 0 0 0; text-align: right; clear: both; margin: 0px;} 
+.paginator li { display : inline;} 
+.paginator li a { padding: 4px 7px 4px 7px;font-size: 11px;text-decoration: none; } 
+.paginator li a:hover { background-color: #d6d6d6; text-decoration: underline; } 
+.paginator li.current a { background-color: #d6d6d6; text-decoration: underline;}
