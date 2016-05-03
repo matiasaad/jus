@@ -307,7 +307,12 @@ div.ui-datepicker{
  font-size:12px;
 }
 
-.modal-dialog  {width:75%;}
+.md-modal-dialog  {width:75%;}
+/*
+.sm-modal-dialog  {width:45%;}
+*/
+
+.modal-calendar{ cursor: pointer; cursor: hand; }
 
 .box-popup {
 	position: fixed;

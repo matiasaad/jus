@@ -63,7 +63,10 @@ class AudienciasController extends AppController
 		}
 
 		// Obtengo los horarios disponibles de las salas para luego pasarlos a la vista.
-		$horarios_salas = $this->getHorariosSalas();
+		$horarios_salas = $this->Sala->getHorarios();
+
+		// Obtengo los horarios disponibles de las salas para luego pasarlos a la vista.
+		$horarios_personas = $this->Persona->getHorarios();
 
 		// obtengo las ocupaciones de las salas
 		$salas = $this->getSalasInfoInDate(date('Y-m-d'),false);
@@ -118,34 +121,10 @@ class AudienciasController extends AppController
 		// Enviando los datos a la vista.
 		$this->set('personas',$personas);
 		$this->set('horarios_salas',$horarios_salas);
+		$this->set('horarios_personas',$horarios_personas);
 		$this->set('salas', $salas);
 	}
-	
-	public function getHorariosSalas(){
-
-		// Check if user has logged.
-		$user = $this->UserSession->get();
-				
-		// Fraccionamiento de GRID para la seleccion horaria de las salas
-		$fraccion = 15;
 		
-		// procesamiento de horarios disponibles de las salas.
-		$hora_inicio = strtotime($this->Sala->disponibilidad_horaria['hora_inicio']);
-		
-		$hora_fin = strtotime($this->Sala->disponibilidad_horaria['hora_fin']);
-	
-		$horarios_salas = array();
-		
-		for($hora=$hora_inicio; $hora <= $hora_fin; $hora = strtotime('+'.$fraccion.' minutes', $hora)){
-			
-			$horarios_salas[] = array('hora'=>date("H:i",$hora), 'unix'=> $hora);
-		}
-		
-		
-		return $horarios_salas;
-	}
-	
-	
 	
 	// Funcion que obtiene los horarios ocupados de las salas.
 	// Puede funcionar por Ajax o por un llamado interno.
@@ -197,6 +176,66 @@ class AudienciasController extends AppController
 		
 		return $response;
 		
+	}
+	
+	// Funcion que obtiene los horarios de una persona.
+	// funciona mediante un llamado por ajax
+	public function getPersonasTimetable($persona_id = false, $date = 'today'){
+
+		// Check if user has logged.
+		$user = $this->UserSession->get();
+
+		// Chequeo permisos de ususario.
+		if(!$date || (!in_array($user['Usuario']['type'], array($this->permissions['sys_admin'],$this->permissions['administrativo'])))){
+			$this->response->statusCode('400');
+			
+			$this->response->type( 'json' );
+			$this->response->body(json_encode('an unexpected error has occurred!'));
+			$this->response->send(); exit;
+		}
+
+		// chequeo de datos.
+		if(!$persona_id){
+			$this->response->statusCode('400');
+			$this->response->type( 'json' );
+			$this->response->body(json_encode('Error en la conexion con el servidor!'));
+			$this->response->send(); exit;
+		}
+
+		if($date == 'today'){ $date = date('Y-m-d');}
+		$ocupaciones = $this->Ocupacion->query(" SELECT fecha, hora_desde as hora_ini, hora_hasta as hora_fin 
+													FROM ocupaciones as Horarios
+													WHERE Horarios.fecha = '{$date}' 
+															AND 
+														Horarios.persona_id = '{$persona_id}'
+													ORDER BY Horarios.hora_desde ASC
+											");
+
+		$audiencias = $this->Audiencia->query(" SELECT Horarios.fecha, Horarios.hora_ini, Horarios.hora_fin 
+												FROM citaciones as Citacion
+												JOIN audiencias as Horarios on (Citacion.audiencia_id = Horarios.id)
+													WHERE Horarios.fecha = '{$date}'
+															AND
+														  Citacion.persona_id = '{$persona_id}'
+													ORDER BY Horarios.hora_ini ASC
+											");
+
+		// Tengo que unir las respuestas de ambas consultas
+		$horarios = array_merge($ocupaciones,$audiencias);
+
+		$response = array();
+		foreach($horarios as $horario){
+			$response[] = array(
+				'fecha' => $horario['Horarios']['fecha'],
+				'hora_ini' => strtotime(date('Y-m-d').' '.date('H:i:s',strtotime($horario['Horarios']['hora_ini']))),
+				'hora_fin' => strtotime(date('Y-m-d').' '.date('H:i:s',strtotime($horario['Horarios']['hora_fin'])))
+			);
+		}
+
+		// Formo la respuesta y la envio		
+		$this->response->body( json_encode($response));
+		$this->response->type( 'json' );
+		$this->response->send(); exit;
 	}
 	
 	

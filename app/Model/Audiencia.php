@@ -40,6 +40,10 @@ class Audiencia extends AppModel {
 			'type' => array(
 				'rule' => 'date',
 				'message' => 'debe ingresar una fecha valida.'
+			),
+			'checkDate' => array(
+				'rule' => 'checkDateLater',
+				'message' => 'La fecha debe ser posterior a hoy.'
 			)
 		),
 		'hora_ini' => array(
@@ -80,6 +84,13 @@ class Audiencia extends AppModel {
 		return $this->save($data);
 	}
 	
+	private function checkDateLater($data){
+		if(strtotime('now') > strtotime($data['Audiencia']['fecha'].' '.$data['Audiencia']['hora_ini'])){
+			return false;
+		}
+		return true;
+	}
+	
 	private function chequearDisponibilidadSala($data=false){
 		if($data == false){
 			return false;
@@ -105,6 +116,11 @@ class Audiencia extends AppModel {
 		// Si no encontre coincidencia de horarios retorno true.
 		return true;
 	}
+	//
+	//private function checkDateLater($data){
+		//$
+	//}
+	//
 }
 
 ?>

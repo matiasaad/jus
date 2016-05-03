@@ -107,7 +107,9 @@
 								<?php echo $juez['Persona']['apellido'].", ".$juez['Persona']['nombres'];?>
 						</span>
 					</button>
-					<span class="glyphicon glyphicon-calendar" id="<?php echo $juez['Persona']['id'];?>" aria-hidden="true"></span>
+
+					<span data-toggle="modal" data-target="#myModalPersonas" class="glyphicon glyphicon-calendar modal-calendar" rel="<?php echo $juez['Persona']['id'];?>" aria-hidden="true"></span>
+					
 				<?php }?>
 			</div>
         </div>
@@ -126,7 +128,7 @@
 								<?php echo $fiscal['Persona']['apellido'].", ".$fiscal['Persona']['nombres'];?>
 						</span>
 					</button>
-					<span class="glyphicon glyphicon-calendar" id="<?php echo $fiscal['Persona']['id'];?>" aria-hidden="true"></span>
+					<span data-toggle="modal" data-target="#myModalPersonas" class="glyphicon glyphicon-calendar modal-calendar" rel="<?php echo $fiscal['Persona']['id'];?>" aria-hidden="true"></span>
 				<?php }?>
 			</div>
 
@@ -147,7 +149,7 @@
 								<?php echo $defensor['Persona']['apellido'].", ".$defensor['Persona']['nombres'];?>
 						</span>
 					</button>
-					<span class="glyphicon glyphicon-calendar" id="<?php echo $defensor['Persona']['id'];?>" aria-hidden="true"></span>
+					<span data-toggle="modal" data-target="#myModalPersonas" class="glyphicon glyphicon-calendar modal-calendar" rel="<?php echo $defensor['Persona']['id'];?>" aria-hidden="true"></span>
 				<?php }?>
 			</div>
         </div>
@@ -167,65 +169,129 @@
 	<!------------------------------------------- POPUP ENVIROMENT ------------------------------------------------>
 	<!------------------------------------------------------------------------------------------------------------->
 
-  <!-- Modal -->
-  <div class="modal fade" id="myModal" role="dialog">
-    <div class="modal-dialog">
-    
-      <!-- Modal content-->
-      <div class="modal-content" >
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">Reserva de Sala y horarios - <span id="fecha_seleccionada"><?php echo $this->Misc->dateFormatfromMYSQL(date('Y-m-d'));?></span></h4>
-        </div>
-        <div class="modal-body">
-			<div class="row">
-				<div class="col-md-3">
-					<div id="in_fecha"></div>				
-				</div>
-				<div class="col-md-9">
-					<div class="table-responsive">
-					  <table class="table table-striped table-bordered table-hover table-condensed table-fixed header-fixed " style="text-align: center;">
-						<thead>
-							<tr>
-								<th>Horarios</th>
-								<?php foreach($salas as $sala){
-									echo "<th>Sala {$sala['Sala']['numero']} - {$sala['Sala']['descripcion']}</th>";
-								}?>
-							</tr>
-						</thead>
-						<tbody>
-							
-							<?php 
-								$fila =10;
-								foreach($horarios_salas as $hora){
-							?>
-								<tr> 
-									<td><?php echo $hora['hora']; ?></td>
-									<?php
-										$columna = 0;
-										foreach($salas as $sala){
-											echo "<td class='fraction_hour' id='cell".$fila."_".$columna."' ref='".$hora['unix']."|".$sala['Sala']['id']."'> --- </td>";
-											$columna++;
-										}
-									?>
+  <!-- 
+		##########################################
+		###### PERSONS SCHEDULES TABLE MODAL #####
+		##########################################
+  -->
+  <div class="modal fade" id="myModalPersonas" rel="" role="dialog">
+		<div class="modal-dialog sm-modal-dialog">
+		  <!-- Modal content-->
+		  <div class="modal-content" >
+			<div class="modal-header">
+			  <button type="button" class="close" data-dismiss="modal">&times;</button>
+			  <h4 class="modal-title">Horarios de  - <span id="tabla_horarios_persona"></span></h4>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-md-6">
+						<div id="in_fecha_personas"></div>				
+					</div>
+					<div class="col-md-4">
+						<div class="table-responsive">
+						  <table class="table table-striped table-bordered table-hover table-condensed table-fixed header-fixed " style="text-align: center;">
+							<thead>
+								<tr>
+									<th>Horarios</th>
+									<th>Estado</th>
 								</tr>
-							<?php 	
-									$fila++;
-								}
-							?>
-						</tbody>
-					  </table>
-					</div>				
+							</thead>
+							<tbody>
+								
+								<?php 
+									$fila =10;
+									foreach($horarios_personas as $hora){
+								?>
+									<tr> 
+										<td><?php echo $hora['hora']; ?></td>
+										<?php
+											echo "<td class='persona_fraction_hour' id='persona_{$fila}' ref='{$hora['unix']}'> --- </td>";
+										?>
+									</tr>
+								<?php 	
+										$fila++;
+									}
+								?>
+							</tbody>
+						  </table>
+						</div>				
+					</div>
 				</div>
 			</div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-        </div>
-      </div>
-      
-    </div>
+			<div class="modal-footer">
+			  <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+			</div>
+		  </div>
+		  
+		</div>
   </div>
+
+  <!-- 
+		##########################################
+		####### ROMS SCHEDULE TABLE MODAL ########
+		##########################################
+  -->
+
+  <div class="modal fade" id="myModal" role="dialog">
+		<div class="modal-dialog md-modal-dialog">
+		
+		  <!-- Modal content-->
+		  <div class="modal-content" >
+			<div class="modal-header">
+			  <button type="button" class="close" data-dismiss="modal">&times;</button>
+			  <h4 class="modal-title">Reserva de Sala y horarios - <span id="fecha_seleccionada"><?php echo $this->Misc->dateFormatfromMYSQL(date('Y-m-d'));?></span></h4>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-md-3">
+						<div id="in_fecha"></div>				
+					</div>
+					<div class="col-md-9">
+						<div class="table-responsive">
+						  <table class="table table-striped table-bordered table-hover table-condensed table-fixed header-fixed " style="text-align: center;">
+							<thead>
+								<tr>
+									<th>Horarios</th>
+									<?php foreach($salas as $sala){
+										echo "<th>Sala {$sala['Sala']['numero']} - {$sala['Sala']['descripcion']}</th>";
+									}?>
+								</tr>
+							</thead>
+							<tbody>
+								
+								<?php 
+									$fila =10;
+									foreach($horarios_salas as $hora){
+								?>
+									<tr> 
+										<td><?php echo $hora['hora']; ?></td>
+										<?php
+											$columna = 0;
+											foreach($salas as $sala){
+												echo "<td class='fraction_hour' id='cell".$fila."_".$columna."' ref='".$hora['unix']."|".$sala['Sala']['id']."'> --- </td>";
+												$columna++;
+											}
+										?>
+									</tr>
+								<?php 	
+										$fila++;
+									}
+								?>
+							</tbody>
+						  </table>
+						</div>				
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+			  <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+			</div>
+		  </div>
+		  
+		</div>
+  </div>
+
+
 	<!------------------------------------------------------------------------------------------------------------->
 	<!-------------------------------------------- JS ENVIROMENT -------------------------------------------------->
 	<!------------------------------------------------------------------------------------------------------------->
@@ -259,6 +325,7 @@
 			firstDay: 1,
 			isRTL: false,
 			showMonthAfterYear: false,
+			minDate: 0,
 			yearSuffix: ''
 		};
 		$.datepicker.setDefaults($.datepicker.regional['es']);
@@ -271,11 +338,80 @@
 				changeMonth: true,
 				changeYear: true,
 				yearRange: "-10:+10"		
-				
+		});
+		
+		$("#in_fecha_personas").datepicker({
+						
+				onSelect: function (date) {
+					showPersonSchedules(date);
+				},	
+				changeMonth: true,
+				changeYear: true,
+				yearRange: "-10:+10"		
 		});
 
-		// #### RESERVAS ####
+		// ##################################################################
+		// ########################## SHOW SCHEDULES #########################
+		// ##################################################################
+		$(".modal-calendar").click(function(){
+			var persona_id = $(this).attr("rel");
+			$("#myModalPersonas").attr("rel", persona_id);
+
+			showPersonSchedules('today');
+		});
+
+		function showPersonSchedules(date){
+			// obtengo el id de la persona.
+			persona_id = $("#myModalPersonas").attr("rel");
+console.log(date);
+console.log(persona_id);
+			// HAGO EL LLAMADO POR AJAX
+			$.post("<?php echo $this->Html->url(array("controller" => "Audiencias","action" => "getPersonasTimetable"));?>/"+persona_id+"/"+date, function(data, status) {
+console.log("respuesta");
+				console.log(data);
+				
+				var date_sel = new Date($("#in_fecha").datepicker( "getDate" ));
+				fecha_select = $.datepicker.formatDate("dd/mm/yy", date_sel);
+				$("#tabla_horarios_persona").html(fecha_select);
+
+				//Con la respuesta llamo a la funcion correspondiente.
+				completePersonGrid(data);
+			}, "json");
+		}
+
+		function cleanPersonGrid(){
+			//$(".persona_fraction_hour").
+		}
 		
+		
+		// Se encarga de pinta y setear el texto de todas las celdas que se encuentran ocupadas
+		function completePersonGrid(data){
+			// Recorro todas los horarios ocupados
+			$.each(data, function( index , ocupados ) {
+				// Se parsean los horarios para poder compararlos
+				var hora_ini = parseInt(ocupados['hora_ini']);
+				var hora_fin = parseInt(ocupados['hora_fin']);
+
+				//recorro todas las celdas
+				$(".persona_fraction_hour").each(function() {
+
+					// Parseo y obtengo los resultados.
+					var hora = $(this).attr("ref");
+
+					//debo pintar todas las celdas que pertenezcan a un horario ocupado
+					if(( hora_ini <= hora ) &&  ( hora<=hora_fin )){
+						
+						// Debo pintar este elemento ya que el horario que representa para esta sala se encuentra ocupado
+						$( "td[ref*='"+hora+"']" ).css("background-color", Ocupado_color);
+						$( "td[ref*='"+hora+"']" ).css("color", Ocupado_text_color);
+						$( "td[ref*='"+hora+"']" ).html(Ocupado_text);
+					}
+				});	
+			});
+		}		
+		// ##################################################################
+		// ############################ RESERVAS ############################
+		// ##################################################################
 		var horarios_salas = <?php echo json_encode($horarios_salas); ?>;
 		var salas = <?php echo json_encode($salas);?>;
 		
